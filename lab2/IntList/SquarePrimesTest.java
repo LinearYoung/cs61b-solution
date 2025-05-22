@@ -13,8 +13,15 @@ public class SquarePrimesTest {
     @Test
     public void testSquarePrimesSimple() {
         IntList lst = IntList.of(14, 15, 16, 17, 18);
-        boolean changed = IntListExercises.squarePrimes(lst);
+        boolean changed = IntListExercises.squarePrimes(lst, false);
         assertEquals("14 -> 15 -> 16 -> 289 -> 18", lst.toString());
+        assertTrue(changed);
+    }
+
+    @Test public void testSquarePrime1 () {
+        IntList lst = IntList.of(2, 4, 13, 19, 33, 47);
+        boolean changed = IntListExercises.squarePrimes(lst, false);
+        assertEquals("4 -> 4 -> 169 -> 361 -> 33 -> 2209", lst.toString());
         assertTrue(changed);
     }
 }
