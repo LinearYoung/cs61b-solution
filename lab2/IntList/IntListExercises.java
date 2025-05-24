@@ -10,11 +10,10 @@ public class IntListExercises {
      */
     public static void addConstant(IntList lst, int c) {
         IntList head = lst;
-        while (head.rest != null) {
+        while (head != null) {
             head.first += c;
             head = head.rest;
         };
-        head.first += c;
     }
 
     /**
@@ -67,19 +66,16 @@ public class IntListExercises {
      */
     public static boolean squarePrimes(IntList lst) {
         // Base Case: we have reached the end of the list
-        boolean changed = false;
         if (lst == null) {
             return false;
         }
-
         boolean currElemIsPrime = Primes.isPrime(lst.first);
 
         if (currElemIsPrime) {
             lst.first *= lst.first;
-            changed = true;
         }
-        squarePrimes(lst.rest);
 
-        return changed;
+        return  squarePrimes(lst.rest) || currElemIsPrime;
     }
+
 }
