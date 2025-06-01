@@ -69,6 +69,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable{
 
     @Override
     public T get(int index) {
+         if(index >= size) {
+             return null;
+         }
         return items[(index + first) % items.length];
     }
 
