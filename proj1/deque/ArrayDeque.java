@@ -94,7 +94,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             last = (last + items.length - 1) % items.length;
         }
         size -= 1;
-        if (size >= 16 && size < items.length * usagefactor) {
+        if (size >= 16 && (double) size / items.length < usagefactor) {
             resize(items.length / 2);
         }
         return lastItem;
@@ -111,7 +111,7 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T> {
             first = (first + 1) % items.length;
         }
         size -= 1;
-        if (size >= 16 && size < items.length * usagefactor) {
+        if (size >= 16 && (double) size / items.length < usagefactor) {
             resize(items.length / 2);
         }
         return firstItem;
