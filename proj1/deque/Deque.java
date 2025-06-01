@@ -1,6 +1,6 @@
 package deque;
 
-public interface Deque <T>{
+public interface Deque<T> {
     //add item to the front of the deque
     void addFirst(T item);
 
@@ -8,7 +8,7 @@ public interface Deque <T>{
     void addLast(T item);
 
     //return true if the deque is empty, false otherwise
-    default boolean isEmpty(){
+    default boolean isEmpty() {
         if (size() == 0) {
             return true;
         }
@@ -30,5 +30,5 @@ public interface Deque <T>{
 
     //Gets the item at the given index, where 0 is the front, 1 is the next item, and so forth.
     // If no such item exists, returns null. Must not alter the deque!
-    public T get(int index);
+    T get(int index);
 }
