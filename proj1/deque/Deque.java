@@ -2,10 +2,10 @@ package deque;
 
 public interface Deque <T>{
     //add item to the front of the deque
-    void AddFirst(T item);
+    void addFirst(T item);
 
     //add item to the back of the deque
-    void AddLast(T item);
+    void addLast(T item);
 
     //return true if the deque is empty, false otherwise
     default boolean isEmpty(){
