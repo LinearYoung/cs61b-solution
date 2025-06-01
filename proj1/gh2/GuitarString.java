@@ -22,7 +22,9 @@ public class GuitarString {
         buffer = new ArrayDeque<>();
         int capacity = (int) Math.round(SR / frequency);
         for (int i = 0; i < capacity; i++) {
-            buffer.addLast((double) 0); //ArrayDeque.addFirst may cause bug because the FirstIndex logic of generation
+            buffer.addLast((double) 0);
+            //ArrayDeque.addFirst may cause bug
+            // because the FirstIndex logic of generation
         }
     }
 
