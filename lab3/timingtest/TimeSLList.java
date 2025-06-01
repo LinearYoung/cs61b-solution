@@ -45,7 +45,6 @@ public class TimeSLList {
             opCounts.addLast(opcount);
             N *= 2;
         }
-
         printTimingTable(Ns, times, opCounts);
     }
 

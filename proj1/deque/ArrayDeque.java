@@ -36,9 +36,13 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
      }
 
      private void resize(int capacity) {
-         T[] a = (T[]) new Object[capacity];
-         System.arraycopy(items, 0, a, 0, size);
-         items = a;
+         T[] newArray = (T[]) new Object[capacity];
+         for (int i = 0; i < size; i++) {
+             newArray[i] = items[(first + i) % items.length];
+         }
+         items = newArray;
+         first = 0;
+         last = size == 0 ? 0 : size - 1;
      }
     @Override
     public void addFirst(T item) {
@@ -83,8 +87,11 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
              return null;
          }
          T LastItem = items[last];
-         size -= 1;
-         last -= 1;
+         items[last] = null;
+         if(size != 1) {
+             last = (last + items.length - 1) % items.length;
+         }
+        size -= 1;
          if(size >= 16 && size < items.length * usagefactor) {
              resize (items.length / 2);
          }
@@ -97,7 +104,10 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
              return null;
          }
          T FirstItem = items[first];
-         first = (first + 1) % items.length;
+         items[first] = null;
+         if(size != 1) {
+             first = (first + 1) % items.length;
+         }
          size -= 1;
         if(size >= 16 && size < items.length * usagefactor) {
             resize (items.length / 2);
@@ -123,10 +133,12 @@ public class ArrayDeque<T> implements Deque<T>, Iterable<T>{
          if(o instanceof Deque) {
              Deque<T> target = (Deque<T>) o;
              for(int i = 0; i < size; i ++) {
-                 if(this.get(i) != target.get(i)) {
+                 if(!this.get(i).equals(target.get(i))) {
                      return false;
                  }
              }
+         } else {
+             return false;
          }
          return true;
     }
