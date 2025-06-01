@@ -57,7 +57,9 @@ public class ArrayDeque<T> implements Deque<T>, Iterable{
          if(size == items.length) {
              resize(size * 2);
          }
-         last = (last + 1) % items.length;
+         if(size != 0) {
+             last = (last + 1) % items.length;
+         }
          items[last] = item;
          size += 1;
     }
