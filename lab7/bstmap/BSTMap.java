@@ -58,7 +58,10 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
     @Override
     public int size() {
-        return root == null? 0 : root.size;
+        return size(root);
+    }
+    private int size(BSTNode node) {
+        return node == null ? 0 : node.size;
     }
 
     @Override
@@ -66,7 +69,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
        put(root, key, value);
     }
 
-    private void put(BSTNode node, K key, V value) {
+    private BSTNode put(BSTNode node, K key, V value) {
         if(node == null) {
             root = new BSTNode(key, value, 1);
         }
@@ -74,15 +77,16 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
             int cmp = key.compareTo(node.key);
 
             if (cmp > 0) {
-                put(node.right, key, value);
+                node.right = put(node.right, key, value);
                 node.size += 1;
             } else if (cmp < 0) {
-                put(node.left, key, value);
+                node.left = put(node.left, key, value);
                 node.size += 1;
             } else {
                 node.value = value;
             }
         }
+        return node;
     }
 
     @Override
@@ -116,10 +120,10 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
         }
         int cmp = key.compareTo(node.key);
         if(cmp > 0) {
-            remove(node.right, key);
+            node.right = remove(node.right, key);
         }
         else if (cmp < 0){
-            remove(node.left, key);
+            node.left = remove(node.left, key);
         }
         else {
             //有0或1个节点直接将子节点接入该节点的父节点
@@ -136,13 +140,13 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
             node.right = removeMin(temp.right);
             node.left = temp.left;
         }
-        node.size = 1 + node.left.size + node.right.size;
+        node.size = 1 + size(node.left) + size(node.right);
         return node;
     }
 
     private BSTNode findMin(BSTNode node) {
         if(node.left == null) {
-            return node.right;
+            return node;
         }
         else return findMin(node.left);
     }
@@ -152,14 +156,14 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
             return node.right;
         }
         node.left = removeMin(node.left);
-        node.size = 1 + node.left.size + node.right.size;
+        node.size = 1 + size(node.left) + size(node.right);
         return node;
     }
 
     @Override
     public V remove(K key, V value) {
         if(get(key).equals(value)) {
-            remove(root, key);
+            root = remove(root, key);
             return value;
         }
         return null;
