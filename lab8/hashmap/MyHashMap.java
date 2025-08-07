@@ -157,7 +157,7 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
         return null;
     }
 
-    public int getIndex(K key) {
+    private int getIndex(K key) {
         return Math.floorMod(key.hashCode(), size);
     }
 
