@@ -66,12 +66,12 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
     @Override
     public void put(K key, V value) {
-       put(root, key, value);
+       root = put(root, key, value);
     }
 
     private BSTNode put(BSTNode node, K key, V value) {
         if(node == null) {
-            root = new BSTNode(key, value, 1);
+            node = new BSTNode(key, value, 1);
         }
         else {
             int cmp = key.compareTo(node.key);
@@ -136,7 +136,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
             //该节点有两个子节点，寻找successor来代替该节点
             //并对右侧部分进行删除successor节点操作，因为successor必然只有0或1个节点，从而实现问题转化
             BSTNode temp = node;
-            node = findMin(node.left);
+            node = findMin(node.right);
             node.right = removeMin(temp.right);
             node.left = temp.left;
         }
@@ -162,7 +162,8 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
     @Override
     public V remove(K key, V value) {
-        if(get(key).equals(value)) {
+        V current = get(key);
+        if(current != null && current.equals(value)) {
             root = remove(root, key);
             return value;
         }
