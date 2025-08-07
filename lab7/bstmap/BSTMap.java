@@ -70,16 +70,18 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
         if(node == null) {
             root = new BSTNode(key, value, 1);
         }
-        int cmp = key.compareTo(node.key);
-        if(cmp > 0) {
-            put(node.right, key, value);
-            node.size += 1;
-        } else if (cmp < 0) {
-            put(node.left, key, value);
-            node.size += 1;
-        }
         else {
-            node.value = value;
+            int cmp = key.compareTo(node.key);
+
+            if (cmp > 0) {
+                put(node.right, key, value);
+                node.size += 1;
+            } else if (cmp < 0) {
+                put(node.left, key, value);
+                node.size += 1;
+            } else {
+                node.value = value;
+            }
         }
     }
 
