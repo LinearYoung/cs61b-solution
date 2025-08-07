@@ -4,7 +4,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
-    public class BSTNode {
+    private class BSTNode {
         private K key;
         private V value;
         private BSTNode left;
@@ -58,7 +58,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
 
     @Override
     public int size() {
-        return root.size;
+        return root == null? 0 : root.size;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
     }
 
     private void put(BSTNode node, K key, V value) {
-        if(node.size == 0) {
+        if(node == null) {
             root = new BSTNode(key, value, 1);
         }
         int cmp = key.compareTo(node.key);
@@ -138,14 +138,14 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
         return node;
     }
 
-    BSTNode findMin(BSTNode node) {
+    private BSTNode findMin(BSTNode node) {
         if(node.left == null) {
             return node.right;
         }
         else return findMin(node.left);
     }
 
-    BSTNode removeMin(BSTNode node) {
+    private BSTNode removeMin(BSTNode node) {
         if(node.left == null) {
             return node.right;
         }
@@ -199,5 +199,18 @@ public class BSTMap<K extends Comparable<K>, V> implements Map61B<K, V>{
             }
             return res;
         }
+    }
+
+    public void printInOrder() {
+        printInOrder(root);
+    }
+
+    private void printInOrder(BSTNode node) {
+        if (node == null) {
+            return;
+        }
+        printInOrder(node.left);
+        System.out.print(node.key + ", ");
+        printInOrder(node.right);
     }
 }
