@@ -127,9 +127,9 @@ public class IndexUtils {
     public static boolean isStaged(String fileName, Commit commit) {
         assert fileName != null && commit != null;
         HashMap<String, String> fileVersionMap = commit.getFileVersionMap();
-        return (indexMap.containsKey(fileName) && !fileVersionMap.containsKey(fileName)) ||
-                (indexMap.containsKey(fileName) && fileVersionMap.containsKey(fileName) &&
-                        !fileVersionMap.get(fileName).equals(fileVersionMap.get(fileName)));
+        return (indexMap.containsKey(fileName) && !fileVersionMap.containsKey(fileName))
+                || (indexMap.containsKey(fileName) && fileVersionMap.containsKey(fileName)
+                && !fileVersionMap.get(fileName).equals(fileVersionMap.get(fileName)));
     }
 
     /**
@@ -141,10 +141,10 @@ public class IndexUtils {
     }
 
     public static List<String> getUntrackedFiles(Commit commit) {
-        List<String> CWDFileNames = plainFilenamesIn(CWD);
+        List<String> cwdFileNames = plainFilenamesIn(CWD);
         List<String> res = new LinkedList<>();
-        assert CWDFileNames != null;
-        for (String fileName : CWDFileNames) {
+        assert cwdFileNames != null;
+        for (String fileName : cwdFileNames) {
             if (!isStaged(fileName, commit) && !CommitUtils.isTrackedByCommit(commit, fileName)) {
                 res.add(fileName);
             }
@@ -162,13 +162,14 @@ public class IndexUtils {
      * @return modifiedNotStagedForCommit file name list
      */
     public static List<StringBuffer> modifiedNotStagedForCommit(Commit commit) {
-        List<String> CWDFileNames = plainFilenamesIn(CWD);
+        List<String> cwdFileNames = plainFilenamesIn(CWD);
         List<StringBuffer> res = new LinkedList<>();
-        for (String fileName : CWDFileNames) {
+        for (String fileName : cwdFileNames) {
             boolean fileIsStaged = isStaged(fileName, commit);
             boolean fileIsTracked = CommitUtils.isTrackedByCommit(commit, fileName);
-            if ((fileIsStaged && !FileUtils.hasSameSHA1(fileName, indexMap.get(fileName)) ||
-                    (fileIsTracked && !FileUtils.hasSameSHA1(fileName, commit.getFileVersionMap().get(fileName)) && !fileIsStaged))) {
+            if ((fileIsStaged && !FileUtils.hasSameSHA1(fileName, indexMap.get(fileName))
+                    || (fileIsTracked && !FileUtils.hasSameSHA1(fileName, commit.getFileVersionMap().get(fileName))
+                            && !fileIsStaged))) {
                 res.add(new StringBuffer(fileName));
             }
         }
@@ -182,18 +183,18 @@ public class IndexUtils {
      * @return deletedNotStagedForCommit file name list
      */
     public static List<StringBuffer> deletedNotStagedForCommit(Commit commit) {
-        List<String> CWDFileNames = plainFilenamesIn(CWD);
-        assert CWDFileNames != null;
+        List<String> cwdFileNames = plainFilenamesIn(CWD);
+        assert cwdFileNames != null;
         List<StringBuffer> res = new LinkedList<>();
         List<String> stagedFiles = getStagedFiles(commit);
         for (String fileName : stagedFiles) {
-            if (!CWDFileNames.contains(fileName)) {
+            if (!cwdFileNames.contains(fileName)) {
                 res.add(new StringBuffer(fileName));
             }
         }
         HashMap<String, String> fileVersionMap = commit.getFileVersionMap();
         for (String fileName : fileVersionMap.keySet()) {
-            if (!CWDFileNames.contains(fileName) && !isRemoval(fileName, commit)) {
+            if (!cwdFileNames.contains(fileName) && !isRemoval(fileName, commit)) {
                 res.add(new StringBuffer(fileName));
             }
         }

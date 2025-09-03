@@ -35,17 +35,17 @@ public class BranchUtils {
     /**
      * set new commitId to the branch
      */
-    public static void saveCommitId(String branchName, String CommitId) {
+    public static void saveCommitId(String branchName, String commitId) {
         if (branchName.contains("/")) {
             String[] splits = branchName.split("/");
             File folder = join(BRANCHES_DIR, splits[0]);
             if (!folder.exists()) {
                 folder.mkdir();
             }
-            Utils.writeContents(join(folder, splits[1]), CommitId);
+            Utils.writeContents(join(folder, splits[1]), commitId);
             return;
         }
-        Utils.writeContents(join(BRANCHES_DIR, branchName), CommitId);
+        Utils.writeContents(join(BRANCHES_DIR, branchName), commitId);
     }
 
     public static boolean removeBranch(String branchName) {

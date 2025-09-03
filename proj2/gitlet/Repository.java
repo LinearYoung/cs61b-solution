@@ -10,8 +10,6 @@ import static gitlet.GitletConstants.*;
 import static gitlet.IndexUtils.*;
 import static gitlet.Utils.*;
 
-// TODO: any imports you need here
-
 /**
  * @Represents a gitlet repository.
  * Provide helper functions called by Main method.
@@ -248,9 +246,9 @@ public class Repository {
             System.out.println("No need to checkout the current branch");
             return;
         }
-        List<String> CWDFiles = plainFilenamesIn(CWD);
+        List<String> cwdFiles = plainFilenamesIn(CWD);
         assert CWD != null;
-        for (String fileName : CWDFiles) {
+        for (String fileName : cwdFiles) {
             if (!CommitUtils.isTrackedByCommit(commit, fileName)) {
                 System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
                 return;
@@ -389,7 +387,7 @@ public class Repository {
                         System.out.println(MERGE_MODIFY_UNTRACKED_WARNING);
                         return;
                     } else {
-                        checkoutFile(currentCommit, fileName);
+                        checkoutFile(branchCommit, fileName);
                         add(fileName);
                     }
                 }
@@ -400,11 +398,11 @@ public class Repository {
 
             if (!splitBranchConsistent && !splitCurrentConsistent && !branchCurrentConsistent) {
                 conflictFlag = true;
-                StringBuilder conflictedContents = new StringBuilder("<<<<<<< HEAD");
-                String currentCommitContent = currentCommitFiles.contains(fileName) ?
-                        FileUtils.getFileContent(fileName, currentCommit) : "";
-                String branchCommitContents = branchCommitFiles.contains(fileName) ?
-                        FileUtils.getFileContent(fileName, branchCommit) : "";
+                StringBuilder conflictedContents = new StringBuilder("<<<<<<< HEAD\n");
+                String currentCommitContent = currentCommitFiles.contains(fileName)
+                        ? FileUtils.getFileContent(fileName, currentCommit) : "";
+                String branchCommitContents = branchCommitFiles.contains(fileName)
+                        ? FileUtils.getFileContent(fileName, branchCommit) : "";
                 conflictedContents.append(currentCommitContent);
                 conflictedContents.append("=======\n");
                 conflictedContents.append(branchCommitContents);
@@ -416,20 +414,19 @@ public class Repository {
                     FileUtils.writeCWDFile(fileName, String.valueOf(conflictedContents));
                     add(fileName);
                 }
-
-                //call the commit api to make a commit
-                //set the secondparentId to it
-                commit("Merged" + branchName + "into" + HEAD + ".");
-                Commit mergeCommit = CommitUtils.readCommit(getHeadCommitId());
-                mergeCommit.setSecondParentId(BranchUtils.getCommitId(branchName));
-                //save the secondParentId
-                CommitUtils.saveCommit(mergeCommit);
-                BranchUtils.saveCommitId(HEAD, CommitUtils.getCommitId(mergeCommit));
-
-                if (conflictFlag) {
-                    System.out.println("Encountered a merge conflict.");
-                }
             }
+        }
+        //call the commit api to make a commit
+        //set the secondparentId to it
+        commit("Merged" + branchName + "into" + HEAD + ".");
+        Commit mergeCommit = CommitUtils.readCommit(getHeadCommitId());
+        mergeCommit.setSecondParentId(BranchUtils.getCommitId(branchName));
+        //save the secondParentId
+        CommitUtils.saveCommit(mergeCommit);
+        BranchUtils.saveCommitId(HEAD, CommitUtils.getCommitId(mergeCommit));
+
+        if (conflictFlag) {
+            System.out.println("Encountered a merge conflict.");
         }
     }
 

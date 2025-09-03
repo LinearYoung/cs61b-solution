@@ -9,61 +9,74 @@ import java.util.TimeZone;
 
 public class Commit implements Serializable {
 
-    /** The message of this Commit. */
+    /**
+     * The message of this Commit.
+     */
     private String message;
-    /** the commit timestamp */
+    /**
+     * the commit timestamp
+     */
     private Date commitTime;
-    /** the parent SHA1 value */
+    /**
+     * the parent SHA1 value
+     */
     private String parentId;
-    /** the second parent SHA1 value */
-    private  String secondParentId;
-    /** store flat file name and its version(represented by SHA1) */
+    /**
+     * the second parent SHA1 value
+     */
+    private String secondParentId;
+    /**
+     * store flat file name and its version(represented by SHA1)
+     */
     private HashMap<String, String> fileVersionMap;
+
     public Commit() {
-       fileVersionMap = new HashMap<>();
+        fileVersionMap = new HashMap<>();
     }
 
     public String getMessage() {
         return message;
     }
 
-    public String getParentId() {
-        return parentId;
-    }
-
-    public Date getCommitTime() {
-        return commitTime;
-    }
-
-    public HashMap<String, String> getFileVersionMap() {
-        return fileVersionMap;
-    }
-
-    public String getSecondParentId() {
-        return secondParentId;
-    }
-
-    public void setCommitTime(Date commitTime) {
-        this.commitTime = commitTime;
-    }
-
-    public void setFileVersionMap(HashMap<String, String> fileVersionMap) {
-        this.fileVersionMap = fileVersionMap;
-    }
-
     public void setMessage(String message) {
         this.message = message;
     }
 
-    public void setSecondParentId(String secondParentId) {
-        this.secondParentId = secondParentId;
+    public String getParentId() {
+        return parentId;
     }
 
     public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 
-    /** print the information about commit for log */
+    public Date getCommitTime() {
+        return commitTime;
+    }
+
+    public void setCommitTime(Date commitTime) {
+        this.commitTime = commitTime;
+    }
+
+    public HashMap<String, String> getFileVersionMap() {
+        return fileVersionMap;
+    }
+
+    public void setFileVersionMap(HashMap<String, String> fileVersionMap) {
+        this.fileVersionMap = fileVersionMap;
+    }
+
+    public String getSecondParentId() {
+        return secondParentId;
+    }
+
+    public void setSecondParentId(String secondParentId) {
+        this.secondParentId = secondParentId;
+    }
+
+    /**
+     * print the information about commit for log
+     */
     public void printCommitInfo() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d HH:mm:ss yyyy Z", Locale.US);
         sdf.setTimeZone(TimeZone.getTimeZone("GMT-8"));

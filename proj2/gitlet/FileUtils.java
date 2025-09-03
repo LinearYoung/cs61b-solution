@@ -64,11 +64,11 @@ public class FileUtils {
      */
     public static void restoreCommitFiles(Commit commit) {
         HashMap<String, String> fileVersionMap = commit.getFileVersionMap();
-        List<String> CWDfileNames = plainFilenamesIn(CWD);
-        assert CWDfileNames != null;
-        for (String fileName : CWDfileNames) {
+        List<String> cwdFileNames = plainFilenamesIn(CWD);
+        assert cwdFileNames != null;
+        for (String fileName : cwdFileNames) {
             if (!fileVersionMap.containsKey(fileName)) {
-                Utils.restrictedDelete(join(CWD, fileName));
+                restrictedDelete(join(CWD, fileName));
             }
         }
         for (String fileName : fileVersionMap.keySet()) {
@@ -77,8 +77,8 @@ public class FileUtils {
     }
 
     public static boolean isOverwritingOrDeletingCWDUntracked(String fileName, Commit currentCommit) {
-        List<String> CWDFileNames = plainFilenamesIn(CWD);
-        assert CWDFileNames != null && currentCommit != null;
-        return !CommitUtils.isTrackedByCommit(currentCommit, fileName) && CWDFileNames.contains(fileName);
+        List<String> cwdFileNames = plainFilenamesIn(CWD);
+        assert cwdFileNames != null && currentCommit != null;
+        return !CommitUtils.isTrackedByCommit(currentCommit, fileName) && cwdFileNames.contains(fileName);
     }
 }

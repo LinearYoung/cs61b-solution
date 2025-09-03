@@ -82,16 +82,16 @@ public class RemoteUtils {
         writeContents(remoteBranchFile, branchContent);
     }
 
-    public static void copyObjectFileToRemote(String SHA1, String remoteName) {
-        String fileContent = FileUtils.getFileContent(SHA1);
+    public static void copyObjectFileToRemote(String sha1, String remoteName) {
+        String fileContent = FileUtils.getFileContent(sha1);
         File remoteObjectFolder = remoteObjectsFolder(remoteName);
-        File remoteObjectFile = join(remoteObjectFolder, SHA1);
+        File remoteObjectFile = join(remoteObjectFolder, sha1);
         writeContents(remoteObjectFile, fileContent);
     }
 
-    public static void copyObjectFileFromRemote(String SHA1, String remoteName) {
+    public static void copyObjectFileFromRemote(String sha1, String remoteName) {
         File remoteObjectFolder = remoteObjectsFolder(remoteName);
-        File remoteObjectFile = join(remoteObjectFolder, SHA1);
+        File remoteObjectFile = join(remoteObjectFolder, sha1);
         String fileContent = readContentsAsString(remoteObjectFile);
         FileUtils.writeGitletObjectsFile(fileContent);
     }
@@ -106,11 +106,11 @@ public class RemoteUtils {
 
     public static boolean remoteBranchExists(String branchName, String remoteName) {
         File remoteBranchesFolder = remoteBranchsFolder(remoteName);
-        List<String> StringList = plainFilenamesIn(remoteBranchesFolder);
-        if (StringList == null) {
+        List<String> stringList = plainFilenamesIn(remoteBranchesFolder);
+        if (stringList == null) {
             return false;
         }
-        return StringList.contains(branchName);
+        return stringList.contains(branchName);
     }
 
     public static Commit readRemoteCommit(String commitId, String remoteName) {

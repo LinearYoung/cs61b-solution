@@ -18,7 +18,7 @@ public class Main {
         switch (firstArg) {
             case "init":
                 if (restArgs.length == 0) {
-                   Repository.init();
+                    Repository.init();
                 } else {
                     System.out.println(INCORRECT_OPERANDS_WARNING);
                 }
@@ -107,11 +107,11 @@ public class Main {
     }
 
     private static void commandRunner(boolean argsNumberCheck, Runnable function) {
-        if(!Repository.isInitialized()) {
+        if (!Repository.isInitialized()) {
             System.out.println(UNINITIALIZED_WARNING);
             return;
         }
-        if(!argsNumberCheck) {
+        if (!argsNumberCheck) {
             System.out.println(INCORRECT_OPERANDS_WARNING);
             return;
         }

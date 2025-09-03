@@ -162,21 +162,31 @@ public class CommitUtils {
 
         while (!stack.isEmpty()) {
             String commitId = stack.pop();
-            if (commitId == null || !seen.add(commitId) || stop.equals(commitId)) continue;
+            if (commitId == null || !seen.add(commitId) || stop.equals(commitId)) {
+                continue;
+            }
             need.add(commitId);
             Commit c = CommitUtils.readCommit(commitId);
-            if (c.getParentId() != null) stack.push(c.getParentId());
-            if (c.getSecondParentId() != null) stack.push(c.getSecondParentId());
+            if (c.getParentId() != null) {
+                stack.push(c.getParentId());
+            }
+            if (c.getSecondParentId() != null) {
+                stack.push(c.getSecondParentId());
+            }
         }
 
         List<String> order = new ArrayList<>();
         seen.clear();
-        for (String cid : need) dfsPost(cid, need, seen, order);
+        for (String cid : need) {
+            dfsPost(cid, need, seen, order);
+        }
         return order;
     }
 
     private static void dfsPost(String commitId, Set<String> need, Set<String> seen, List<String> out) {
-        if (commitId == null || !need.contains(commitId) || !seen.add(commitId)) return;
+        if (commitId == null || !need.contains(commitId) || !seen.add(commitId)) {
+            return;
+        }
         Commit c = CommitUtils.readCommit(commitId);
         dfsPost(c.getParentId(), need, seen, out);
         dfsPost(c.getSecondParentId(), need, seen, out);
@@ -228,8 +238,8 @@ public class CommitUtils {
             return null;
         }
 
-        return branch1Traced.size() < branch2Traced.size() ?
-                branch1Traced.get(minLength - 1) : branch2Traced.get(minLength - 1);
+        return branch1Traced.size() < branch2Traced.size()
+                ? branch1Traced.get(minLength - 1) : branch2Traced.get(minLength - 1);
     }
 
     /**
@@ -251,16 +261,16 @@ public class CommitUtils {
             }
         }
 
-        Commit SplitCommit = null;
+        Commit splitCommit = null;
 
-        for (String CommitId : commonAncestors) {
-            Commit c = readCommit(CommitId);
-            if (SplitCommit == null || c.getCommitTime().after(SplitCommit.getCommitTime())) {
-                SplitCommit = c;
+        for (String commitId : commonAncestors) {
+            Commit c = readCommit(commitId);
+            if (splitCommit == null || c.getCommitTime().after(splitCommit.getCommitTime())) {
+                splitCommit = c;
             }
         }
 
-        return SplitCommit;
+        return splitCommit;
     }
 
     /**
