@@ -159,7 +159,7 @@ public class IndexUtils {
             boolean fileIsStaged = isStaged(fileName, commit);
             boolean fileIsTracked = CommitUtils.isTrackedByCommit(commit, fileName);
             if((fileIsStaged && !FileUtils.hasSameSHA1(fileName, indexMap.get(fileName)) ||
-                    (fileIsTracked && FileUtils.hasSameSHA1(fileName, commit.getFileVersionMap().get(fileName)) && !fileIsStaged))) {
+                    (fileIsTracked && !FileUtils.hasSameSHA1(fileName, commit.getFileVersionMap().get(fileName)) && !fileIsStaged))) {
                 res.add(new StringBuffer(fileName));
             }
         }
