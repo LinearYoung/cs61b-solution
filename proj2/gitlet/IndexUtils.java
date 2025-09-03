@@ -5,18 +5,22 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import static gitlet.Utils.*;
 import static gitlet.GitletConstants.*;
+import static gitlet.Utils.*;
 
 /**
  * @description the right usage of this class is: change anything in memory, and finally save your change.
- *  * yes, every command changes index MUST call the method saveIndex() to save their change permanently.
+ * * yes, every command changes index MUST call the method saveIndex() to save their change permanently.
  */
 public class IndexUtils {
-    /** read the index file, which stores a map(file name to version), it represents the next commit's name to version.
-     * which means just after one commit, the indexMap equals to commit fileVersionMap */
+    /**
+     * read the index file, which stores a map(file name to version), it represents the next commit's name to version.
+     * which means just after one commit, the indexMap equals to commit fileVersionMap
+     */
     public static HashMap<String, String> indexMap;
-    /** staged file, which stages sha1 id --> file contents, use to stage or unstage */
+    /**
+     * staged file, which stages sha1 id --> file contents, use to stage or unstage
+     */
     public static HashMap<String, String> stagedFileContent;
 
     static {
@@ -39,6 +43,7 @@ public class IndexUtils {
 
     /**
      * stages a file (note: if file wrong, it will throw exception) in indexMap and stagedFileContents
+     *
      * @note this function will NOT save anything to disk, just keep them in memory
      */
     public static void stageFile(String fileName) {
@@ -60,11 +65,11 @@ public class IndexUtils {
     }
 
     public static HashMap<String, String> hashMapRead(File file) {
-        if(file.length() == 0) {
+        if (file.length() == 0) {
             return new HashMap<>();
         }
         HashMap<String, String> hashMap = readObject(file, HashMap.class);
-        return hashMap == null? new HashMap<>() : hashMap;
+        return hashMap == null ? new HashMap<>() : hashMap;
     }
 
     public static HashMap<String, String> readIndex() {
@@ -83,13 +88,13 @@ public class IndexUtils {
     public static List<String> getStagedFiles(Commit commit) {
         HashMap<String, String> fileVersionMap = commit.getFileVersionMap();
         List<String> res = new LinkedList<>();
-        for(String fileName : indexMap.keySet()){
-            if(fileVersionMap.containsKey(fileName)) {
-                if(!indexMap.get(fileName).equals(fileVersionMap.get(fileName))) {
+        for (String fileName : indexMap.keySet()) {
+            if (fileVersionMap.containsKey(fileName)) {
+                if (!indexMap.get(fileName).equals(fileVersionMap.get(fileName))) {
                     res.add(fileName);
                 }
             }
-            if(!fileVersionMap.containsKey(fileName)) {
+            if (!fileVersionMap.containsKey(fileName)) {
                 res.add(fileName);
             }
         }
@@ -105,14 +110,15 @@ public class IndexUtils {
     public static List<String> getRemovedFiles(Commit commit) {
         HashMap<String, String> fileVersionMap = commit.getFileVersionMap();
         List<String> res = new LinkedList<>();
-        for(String fileName : fileVersionMap.keySet()) {
-            if(!indexMap.containsKey(fileName)) {
+        for (String fileName : fileVersionMap.keySet()) {
+            if (!indexMap.containsKey(fileName)) {
                 res.add(fileName);
             }
         }
         res.sort(String::compareTo);
         return res;
     }
+
     /**
      * a staged file is: a file in indexMap but not in commit fileVersionMap;
      * or a file in indexMap and in commit fileVersionMap but has different version.
@@ -125,6 +131,7 @@ public class IndexUtils {
                 (indexMap.containsKey(fileName) && fileVersionMap.containsKey(fileName) &&
                         !fileVersionMap.get(fileName).equals(fileVersionMap.get(fileName)));
     }
+
     /**
      * these removal files will finally be drop in next commit fileVersionMap.
      */
@@ -144,21 +151,23 @@ public class IndexUtils {
         }
         return res;
     }
+
     /**
      * "modified but not staged"
      * 1, Staged for addition, but with different contents than in the working directory;
      * 2, (modified) Tracked in the current commit, changed in the working directory, but not staged;
      * 3, (deleted) Staged for addition, but deleted in the working directory;
      * 4, Not staged for removal, but tracked in the current commit and deleted from the working directory.
+     *
      * @return modifiedNotStagedForCommit file name list
      */
     public static List<StringBuffer> modifiedNotStagedForCommit(Commit commit) {
         List<String> CWDFileNames = plainFilenamesIn(CWD);
         List<StringBuffer> res = new LinkedList<>();
-        for(String fileName : CWDFileNames) {
+        for (String fileName : CWDFileNames) {
             boolean fileIsStaged = isStaged(fileName, commit);
             boolean fileIsTracked = CommitUtils.isTrackedByCommit(commit, fileName);
-            if((fileIsStaged && !FileUtils.hasSameSHA1(fileName, indexMap.get(fileName)) ||
+            if ((fileIsStaged && !FileUtils.hasSameSHA1(fileName, indexMap.get(fileName)) ||
                     (fileIsTracked && !FileUtils.hasSameSHA1(fileName, commit.getFileVersionMap().get(fileName)) && !fileIsStaged))) {
                 res.add(new StringBuffer(fileName));
             }
@@ -169,6 +178,7 @@ public class IndexUtils {
     /**
      * Staged for addition, but deleted in the working directory; or
      * Not staged for removal, but tracked in the current commit and deleted from the working directory.
+     *
      * @return deletedNotStagedForCommit file name list
      */
     public static List<StringBuffer> deletedNotStagedForCommit(Commit commit) {
@@ -176,8 +186,8 @@ public class IndexUtils {
         assert CWDFileNames != null;
         List<StringBuffer> res = new LinkedList<>();
         List<String> stagedFiles = getStagedFiles(commit);
-        for(String fileName : stagedFiles) {
-            if(!CWDFileNames.contains(fileName)) {
+        for (String fileName : stagedFiles) {
+            if (!CWDFileNames.contains(fileName)) {
                 res.add(new StringBuffer(fileName));
             }
         }

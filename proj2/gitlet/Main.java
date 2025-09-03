@@ -4,37 +4,38 @@ import java.util.Arrays;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import static gitlet.GitletConstants.*;
+import static gitlet.GitletConstants.INCORRECT_OPERANDS_WARNING;
+import static gitlet.GitletConstants.UNINITIALIZED_WARNING;
 
 public class Main {
     public static void main(String[] args) {
-        if(args.length == 0) {
+        if (args.length == 0) {
             System.out.println("Please enter a command.");
             return;
         }
         String firstArg = args[0];
-        String[] restArgs = Arrays.copyOfRange(args, 1 , args.length);
-        switch(firstArg) {
+        String[] restArgs = Arrays.copyOfRange(args, 1, args.length);
+        switch (firstArg) {
             case "init":
-               if(restArgs.length == 0) {
+                if (restArgs.length == 0) {
                    Repository.init();
-               } else {
-                   System.out.println(INCORRECT_OPERANDS_WARNING);
-               }
+                } else {
+                    System.out.println(INCORRECT_OPERANDS_WARNING);
+                }
                 break;
             case "add":
                 commandRunner(restArgs.length == 1, Repository::add, restArgs[0]);
                 break;
-            case "commit" :
+            case "commit":
                 commandRunner(restArgs.length == 1, Repository::commit, restArgs[0]);
                 break;
-            case "rm" :
+            case "rm":
                 commandRunner(restArgs.length == 1, Repository::rm, restArgs[0]);
                 break;
-            case "log" :
+            case "log":
                 commandRunner(restArgs.length == 0, Repository::log);
                 break;
-            case "global-log" :
+            case "global-log":
                 commandRunner(restArgs.length == 0, Repository::globalLog);
                 break;
             case "checkout":
@@ -92,8 +93,9 @@ public class Main {
         function.accept(args);
     }
 
-    private static <T1, T2> void commandRunner(boolean argsNumberCheck, BiConsumer<T1, T2> function, T1 args1, T2 args2) {
-        if(!Repository.isInitialized()) {
+    private static <T1, T2> void commandRunner(boolean argsNumberCheck, BiConsumer<T1, T2> function,
+                                               T1 args1, T2 args2) {
+        if (!Repository.isInitialized()) {
             System.out.println(UNINITIALIZED_WARNING);
             return;
         }

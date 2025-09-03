@@ -1,19 +1,12 @@
 package gitlet;
 
-// TODO: any imports you need here
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
 import java.util.Locale;
-/** Represents a gitlet commit object.
- * just a javabean stores critical information
- * will be serialized to a file in [commits] folder in [.gitlet]
- *
- *  @author TODO
- */
+import java.util.TimeZone;
+
 public class Commit implements Serializable {
 
     /** The message of this Commit. */

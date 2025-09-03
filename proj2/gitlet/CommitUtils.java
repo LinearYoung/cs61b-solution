@@ -1,15 +1,19 @@
 package gitlet;
 
-import java.util.*;
 import java.io.File;
+import java.util.*;
 
-import static gitlet.GitletConstants.*;
+import static gitlet.GitletConstants.COMMITS_DIR;
 import static gitlet.Utils.*;
 
-/** @description class for manipulate commit */
+/**
+ * @description class for manipulate commit
+ */
 public class CommitUtils {
-    /** create an empty commit with no fileVersionMap
+    /**
+     * create an empty commit with no fileVersionMap
      * no parent sha1 id and no parent itself and a empty map
+     *
      * @param message commit message
      * @return a empty commit
      */
@@ -21,11 +25,13 @@ public class CommitUtils {
         commit.setSecondParentId(null);
         commit.setFileVersionMap(new HashMap<>());
         return commit;
-    };
+    }
 
-    /** make a normal commit
-     * @param message commit message
-     * @param parentId parent SHA1 value
+    /**
+     * make a normal commit
+     *
+     * @param message        commit message
+     * @param parentId       parent SHA1 value
      * @param fileVersionMap always from current index map, if == null, will be replaced by an empty hash map
      * @return a commit
      */
@@ -38,13 +44,17 @@ public class CommitUtils {
         return commit;
     }
 
-    /** return the commit SHA1 value as its id */
+    /**
+     * return the commit SHA1 value as its id
+     */
     public static String getCommitId(Commit commit) {
         return sha1(serialize(commit));
     }
 
-    /** save the commit to .gitlet/commits,with file name[sha1],
+    /**
+     * save the commit to .gitlet/commits,with file name[sha1],
      * contents is the serializable string
+     *
      * @param commit the commit will be saved
      * @return commit id
      */
@@ -55,12 +65,14 @@ public class CommitUtils {
         return commmitId;
     }
 
-    /** restore the commit from its commitId file
+    /**
+     * restore the commit from its commitId file
+     *
      * @param commitId SHA1 value
      * @return the commit
      */
     public static Commit readCommit(String commitId) {
-        if(commitId == null) {
+        if (commitId == null) {
             return null;
         }
         return readObject(join(COMMITS_DIR, commitId), Commit.class);
@@ -73,19 +85,19 @@ public class CommitUtils {
      * @return if read failed, if no exception, it will return null
      */
     public static Commit readCommitByPrefix(String prefix) {
-        if(prefix == null) {
+        if (prefix == null) {
             return null;
         }
         List<String> commitList = plainFilenamesIn(COMMITS_DIR);
         int queryCount = 0;
         String resultCommitId = null;
-        for(String commit : commitList) {
-            if(commit.startsWith(prefix)) {
+        for (String commit : commitList) {
+            if (commit.startsWith(prefix)) {
                 queryCount += 1;
                 resultCommitId = commit;
             }
         }
-        if(queryCount > 1) {
+        if (queryCount > 1) {
             throw new RuntimeException("this prefix is ambiguous, you should use longer prefix");
         }
 
@@ -93,18 +105,17 @@ public class CommitUtils {
     }
 
     /**
-     *compare old  and new commit map, and write the new object file
+     * compare old  and new commit map, and write the new object file
      */
     public static void createObjectFile(Commit oldCommit, Commit newCommit, HashMap<String, String> stagedFiles) {
         HashMap<String, String> oldFileVersionMap = oldCommit.getFileVersionMap();
         HashMap<String, String> newFileVersionMap = newCommit.getFileVersionMap();
-        for(String fileName : newFileVersionMap.keySet()) {
-            if(oldFileVersionMap.containsKey(fileName)) {
-                if(!oldFileVersionMap.get(fileName).equals(newFileVersionMap.get(fileName))) {
+        for (String fileName : newFileVersionMap.keySet()) {
+            if (oldFileVersionMap.containsKey(fileName)) {
+                if (!oldFileVersionMap.get(fileName).equals(newFileVersionMap.get(fileName))) {
                     FileUtils.writeGitletObjectsFile(stagedFiles.get(newFileVersionMap.get(fileName)));
                 }
-            }
-            else {
+            } else {
                 FileUtils.writeGitletObjectsFile(stagedFiles.get(newFileVersionMap.get(fileName)));
             }
         }
@@ -131,7 +142,7 @@ public class CommitUtils {
     public static List<Commit> commitTraceBack(Commit currentCommit) {
         List<Commit> commitList = new LinkedList<>();
         Commit commit = currentCommit;
-        while(commit != null) {
+        while (commit != null) {
             commitList.add(commit);
             commit = readCommit(commit.getParentId());
         }
@@ -174,7 +185,8 @@ public class CommitUtils {
 
 
     /**
-     *get all ancestor include itself,by recursion
+     * get all ancestor include itself,by recursion
+     *
      * @param currentCommit
      * @param res
      * @return list of ancestor id
@@ -183,10 +195,10 @@ public class CommitUtils {
         String parentId = currentCommit.getParentId();
         String secondParentId = currentCommit.getSecondParentId();
         res.add(getCommitId(currentCommit));
-        if(parentId != null && !res.contains(parentId)) {
+        if (parentId != null && !res.contains(parentId)) {
             res.addAll(commitAncestors(readCommit(parentId), res));
         }
-        if(secondParentId != null && !res.contains(secondParentId)) {
+        if (secondParentId != null && !res.contains(secondParentId)) {
             res.addAll(commitAncestors(readCommit(secondParentId), res));
         }
         return res;
@@ -194,6 +206,7 @@ public class CommitUtils {
 
     /**
      * get the split point of two branches
+     *
      * @return if the two list has same length and has same commit list, then return null
      */
     public static Commit getSplitCommit(String branch1, String branch2) {
@@ -206,12 +219,12 @@ public class CommitUtils {
         Collections.reverse(branch1Traced);
         Collections.reverse(branch2Traced);
         int minLength = Math.min(branch1Traced.size(), branch2Traced.size());
-        for(int i = 0; i < minLength; i ++) {
-            if(!isSameCommit(branch1Traced.get(i), branch2Traced.get(i))) {
+        for (int i = 0; i < minLength; i++) {
+            if (!isSameCommit(branch1Traced.get(i), branch2Traced.get(i))) {
                 return branch1Traced.get(i - 1);
             }
         }
-        if(branch1Traced.size() == branch2Traced.size()) {
+        if (branch1Traced.size() == branch2Traced.size()) {
             return null;
         }
 
@@ -221,6 +234,7 @@ public class CommitUtils {
 
     /**
      * get the split point of two branches
+     *
      * @return if the two list has same length and has same commit list, then return null
      */
     public static Commit getSplitCommitWithGraph(String branchName1, String branchName2) {
@@ -251,13 +265,14 @@ public class CommitUtils {
 
     /**
      * return if two commit has a same file version, given the file name
+     *
      * @return if one of the commits doesn't contain the file, return null. else return true or false
      */
     public static boolean hasSameFileVersion(String fileName, Commit commit1, Commit commit2) {
         assert fileName != null && commit1 != null && commit2 != null;
         HashMap<String, String> fileVersionMap1 = commit1.getFileVersionMap();
         HashMap<String, String> fileVersionMap2 = commit2.getFileVersionMap();
-        if(!fileVersionMap1.containsKey(fileName) || !fileVersionMap2.containsKey(fileName)) {
+        if (!fileVersionMap1.containsKey(fileName) || !fileVersionMap2.containsKey(fileName)) {
             return false;
         }
         return fileVersionMap1.get(fileName).equals(fileVersionMap2.get(fileName));
@@ -275,10 +290,10 @@ public class CommitUtils {
         HashMap<String, String> fileVersionMap2 = commit2.getFileVersionMap();
         boolean iscontain1 = fileVersionMap1.containsKey(fileName);
         boolean iscontain2 = fileVersionMap2.containsKey(fileName);
-        if(!iscontain1 && !iscontain2) {
+        if (!iscontain1 && !iscontain2) {
             return true;
         }
-        if(!iscontain1 || iscontain2) {
+        if (!iscontain1 || iscontain2) {
             return false;
         }
         Boolean sameContent = hasSameFileVersion(fileName, commit1, commit2);

@@ -18,7 +18,9 @@ public class GitletConstants {
     public static final File REMOTE_FILE_DIR = join(GITLET_DIR, "remotes");
     /** the HEAD file */
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
-    /** the commits directory, store every commit */;
+    /**
+     * the commits directory, store every commit
+     */
     public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     /** the object directory, store explicit files in it */
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
@@ -29,5 +31,4 @@ public class GitletConstants {
     public static final String INCORRECT_OPERANDS_WARNING = "Incorrect operands";
 
     public static  final String MERGE_MODIFY_UNTRACKED_WARNING = "There is an untracked file in the way; delete it, or add and commit it first.";
-
 }

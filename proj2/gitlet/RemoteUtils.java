@@ -2,10 +2,13 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeMap;
 
-import java.util.*;
-
-import static gitlet.GitletConstants.*;
+import static gitlet.GitletConstants.BRANCHES_DIR;
+import static gitlet.GitletConstants.REMOTE_FILE;
 import static gitlet.Utils.*;
 
 public class RemoteUtils {
@@ -29,6 +32,7 @@ public class RemoteUtils {
     public static String getRemotePath(String remoteName) {
         return remoteLocationMap.get(remoteName);
     }
+
     public static File getRemoteGitletFolder(String remoteName) {
         return Utils.join(getRemotePath(remoteName));
     }
@@ -50,7 +54,7 @@ public class RemoteUtils {
     }
 
     public static void copyCommitFileToRemote(String commitId, String remoteName) {
-        if(!isRemoteAdded(remoteName)) {
+        if (!isRemoteAdded(remoteName)) {
             return;
         }
         File remoteCommitsFolder = remoteCommitsFolder(remoteName);
@@ -66,7 +70,7 @@ public class RemoteUtils {
     }
 
     public static void copyBranchFileToRemote(String branchName, String remoteName) {
-        if(!isRemoteAdded(remoteName)) {
+        if (!isRemoteAdded(remoteName)) {
             return;
         }
         if (!BranchUtils.branchExists(branchName)) {
@@ -103,14 +107,14 @@ public class RemoteUtils {
     public static boolean remoteBranchExists(String branchName, String remoteName) {
         File remoteBranchesFolder = remoteBranchsFolder(remoteName);
         List<String> StringList = plainFilenamesIn(remoteBranchesFolder);
-        if(StringList == null) {
+        if (StringList == null) {
             return false;
         }
         return StringList.contains(branchName);
     }
 
     public static Commit readRemoteCommit(String commitId, String remoteName) {
-        if(commitId == null) {
+        if (commitId == null) {
             return null;
         }
         return readObject(join(remoteCommitsFolder(remoteName), commitId), Commit.class);
@@ -119,7 +123,7 @@ public class RemoteUtils {
     public static List<Commit> remoteCommitTraceBack(String commitId, String remoteName) {
         Commit commit = readRemoteCommit(commitId, remoteName);
         List<Commit> res = new LinkedList<>();
-        while(commit != null) {
+        while (commit != null) {
             res.add(commit);
             commit = readRemoteCommit(commit.getParentId(), remoteName);
         }
@@ -129,7 +133,7 @@ public class RemoteUtils {
     public static List<String> remoteCommitIdTraceBack(String commitId, String remoteName) {
         Commit commit = readRemoteCommit(commitId, remoteName);
         List<String> res = new LinkedList<>();
-        while(commit != null) {
+        while (commit != null) {
             res.add(CommitUtils.getCommitId(commit));
             commit = readRemoteCommit(commit.getParentId(), remoteName);
         }
@@ -137,7 +141,7 @@ public class RemoteUtils {
     }
 
     public static String readRemoteBranch(String branchName, String remoteName) {
-        if(!remoteBranchExists(branchName, remoteName)) {
+        if (!remoteBranchExists(branchName, remoteName)) {
             return null;
         }
         File remoteBranchsFolder = remoteBranchsFolder(remoteName);
@@ -145,14 +149,14 @@ public class RemoteUtils {
     }
 
     public static void addRemote(String remoteName, String remotePath) {
-        if(!REMOTE_FILE.exists()) {
+        if (!REMOTE_FILE.exists()) {
             try {
                 REMOTE_FILE.createNewFile();
             } catch (IOException e) {
                 throw new RuntimeException("failed to create remote file");
             }
         }
-        if(isRemoteAdded(remoteName)) {
+        if (isRemoteAdded(remoteName)) {
             System.out.println("A remote with name already exist.");
             return;
         }
@@ -169,10 +173,10 @@ public class RemoteUtils {
     }
 
     public static void removeRemote(String remoteName) {
-        if(!remoteRefsInitialized()) {
+        if (!remoteRefsInitialized()) {
             return;
         }
-        if(!isRemoteAdded(remoteName)) {
+        if (!isRemoteAdded(remoteName)) {
             System.out.println("A remote with that name does not exist.");
             return;
         }
@@ -181,29 +185,29 @@ public class RemoteUtils {
     }
 
     public static void push(String remoteName, String remoteBranchName) {
-        if(!getRemoteGitletFolder(remoteName).exists()) {
+        if (!getRemoteGitletFolder(remoteName).exists()) {
             System.out.println("Remote directory not found.");
             return;
         }
         String remoteHead = readRemoteHead(remoteName);
         String remoteHeadCommitId = readRemoteBranch(remoteBranchName, remoteName);
         Commit currentCommit = CommitUtils.readCommit(Repository.getHeadCommitId());
-        if(Repository.getHeadCommitId().equals(remoteHeadCommitId)) {
+        if (Repository.getHeadCommitId().equals(remoteHeadCommitId)) {
             return;
         }
 
         List<String> commitIdAppending = CommitUtils.collectCommitsTopoOrder(Repository.getHeadCommitId(), remoteHeadCommitId);
         List<String> historyCommitId = CommitUtils.commitAncestors(currentCommit, new LinkedList<>());
-        if(!historyCommitId.contains(remoteHeadCommitId)) {
+        if (!historyCommitId.contains(remoteHeadCommitId)) {
             System.out.println("Please pull down remote changes before pushing.");
             return;
         }
 
-        for(String commitId : commitIdAppending) {
+        for (String commitId : commitIdAppending) {
             copyCommitFileToRemote(commitId, remoteName);
             Commit commit = CommitUtils.readCommit(commitId);
             HashMap<String, String> fileVersionMaps = commit.getFileVersionMap();
-            for(String fileName : fileVersionMaps.keySet()) {
+            for (String fileName : fileVersionMaps.keySet()) {
                 copyObjectFileToRemote(fileVersionMaps.get(fileName), remoteName);
             }
         }
@@ -213,11 +217,11 @@ public class RemoteUtils {
     }
 
     public static void fetch(String remoteName, String remoteBranchName) {
-        if(!getRemoteGitletFolder(remoteName).exists()) {
+        if (!getRemoteGitletFolder(remoteName).exists()) {
             System.out.println("Remote directory not found.");
             return;
         }
-        if(!remoteBranchExists(remoteBranchName, remoteName)) {
+        if (!remoteBranchExists(remoteBranchName, remoteName)) {
             System.out.println("That remote does not have that branch.");
             return;
         }
@@ -225,11 +229,11 @@ public class RemoteUtils {
         String remoteCommitId = readRemoteBranch(remoteBranchName, remoteName);
         List<String> allTracedCommitIds = remoteCommitIdTraceBack(remoteCommitId, remoteName);
 
-        for(String commitId : allTracedCommitIds) {
+        for (String commitId : allTracedCommitIds) {
             copyCommitFileFromRemote(commitId, remoteName);
             Commit commit = CommitUtils.readCommit(commitId);
             HashMap<String, String> fileVersionMap = commit.getFileVersionMap();
-            for(String fileName : fileVersionMap.keySet()) {
+            for (String fileName : fileVersionMap.keySet()) {
                 copyObjectFileFromRemote(fileVersionMap.get(fileName), remoteName);
             }
         }

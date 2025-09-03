@@ -3,23 +3,29 @@ package gitlet;
 import java.util.HashMap;
 import java.util.List;
 
+import static gitlet.GitletConstants.CWD;
+import static gitlet.GitletConstants.OBJECTS_DIR;
 import static gitlet.Utils.*;
-import static gitlet.GitletConstants.*;
 
 public class FileUtils {
 
-    /** get the sha1 of the file */
+    /**
+     * get the sha1 of the file
+     */
     public static String getFileContentSha1(String fileName) {
         return sha1(readContentsAsString(join(CWD, fileName)));
     }
 
-    /** @return if the sha1 of file equal to the target sha1 */
+    /**
+     * @return if the sha1 of file equal to the target sha1
+     */
     public static boolean hasSameSHA1(String fileName, String tagertSHA1) {
         return getFileContentSha1(fileName).equals(tagertSHA1);
     }
 
     /**
      * write the content to the .gitlet/objects/...(sha1/ content value)
+     *
      * @param content the content of file as string
      * @return the sha1 of content
      */
@@ -30,7 +36,6 @@ public class FileUtils {
     }
 
     /**
-     *
      * @param fileName the file which should be saved
      * @return the sha1 of content of the file
      */
@@ -45,8 +50,8 @@ public class FileUtils {
         return readContentsAsString(join(OBJECTS_DIR, fileSHA1));
     }
 
-    public static  String getFileContent(String fileName, Commit commit) {
-        assert  fileName != null && commit != null;
+    public static String getFileContent(String fileName, Commit commit) {
+        assert fileName != null && commit != null;
         return getFileContent(commit.getFileVersionMap().get(fileName));
     }
 
@@ -61,12 +66,12 @@ public class FileUtils {
         HashMap<String, String> fileVersionMap = commit.getFileVersionMap();
         List<String> CWDfileNames = plainFilenamesIn(CWD);
         assert CWDfileNames != null;
-        for(String fileName : CWDfileNames) {
+        for (String fileName : CWDfileNames) {
             if (!fileVersionMap.containsKey(fileName)) {
-                Utils.restrictedDelete(join(CWD,fileName));
-;            }
+                Utils.restrictedDelete(join(CWD, fileName));
+            }
         }
-        for(String fileName : fileVersionMap.keySet()) {
+        for (String fileName : fileVersionMap.keySet()) {
             writeCWDFile(fileName, getFileContent(fileVersionMap.get(fileName)));
         }
     }
