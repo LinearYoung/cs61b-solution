@@ -10,7 +10,7 @@ public class FileUtils {
 
     /** get the sha1 of the file */
     public static String getFileContentSha1(String fileName) {
-        return sha1(serialize(join(CWD, fileName)));
+        return sha1(readContentsAsString(join(CWD, fileName)));
     }
 
     /** @return if the sha1 of file equal to the target sha1 */
@@ -24,7 +24,7 @@ public class FileUtils {
      * @return the sha1 of content
      */
     public static String writeGitletObjectsFile(String content) {
-        String fileID = getFileContentSha1(content);
+        String fileID = sha1(content);
         writeContents(join(OBJECTS_DIR, fileID), content);
         return fileID;
     }

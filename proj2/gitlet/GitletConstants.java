@@ -19,7 +19,7 @@ public class GitletConstants {
     /** the HEAD file */
     public static final File HEAD_FILE = join(GITLET_DIR, "HEAD");
     /** the commits directory, store every commit */;
-    public static final File COMMITS_FILE = join(GITLET_DIR, "commits");
+    public static final File COMMITS_DIR = join(GITLET_DIR, "commits");
     /** the object directory, store explicit files in it */
     public static final File OBJECTS_DIR = join(GITLET_DIR, "objects");
     public static final File BRANCHES_DIR = join(GITLET_DIR, "branches");

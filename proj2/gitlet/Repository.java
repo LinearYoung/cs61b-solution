@@ -1,14 +1,10 @@
 package gitlet;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.*;
 
 import static gitlet.GitletConstants.*;
 import static gitlet.IndexUtils.*;
-import static gitlet.Utils.*;
-
-import  static  gitlet.GitletConstants.*;
 import static gitlet.Utils.*;
 
 // TODO: any imports you need here
@@ -57,7 +53,7 @@ public class Repository {
             throw new RuntimeException("failed to create INDEX, HEAD and STAGED file.");
         }
 
-        COMMITS_FILE.mkdir();
+        COMMITS_DIR.mkdir();
         OBJECTS_DIR.mkdir();
         BRANCHES_DIR.mkdir();
 
@@ -101,7 +97,7 @@ public class Repository {
         CommitUtils.createObjectFile(currentCommit, newCommit, stagedFileContent);
         stagedFileContent.clear();
         IndexUtils.saveIndex();
-        String newCommitId = CommitUtils.getCommitId(newCommit);
+        String newCommitId = CommitUtils.saveCommit(newCommit);
         BranchUtils.saveCommitId(HEAD, newCommitId);
     }
 
@@ -129,7 +125,7 @@ public class Repository {
     }
 
     public static void globalLog() {
-        List<String> commits = plainFilenamesIn(COMMITS_FILE);
+        List<String> commits = plainFilenamesIn(COMMITS_DIR);
         if(commits == null || commits.isEmpty()) {
             return;
         }
@@ -139,7 +135,7 @@ public class Repository {
     }
 
     public static void find(String commitMessage) {
-        List<String> commits = plainFilenamesIn(COMMITS_FILE);
+        List<String> commits = plainFilenamesIn(COMMITS_DIR);
         if(commits == null || commits.isEmpty()) {
             return;
         }
@@ -221,6 +217,7 @@ public class Repository {
             }
             checkoutFile(commit, fileName);
         } else {
+            commit = CommitUtils.readCommit(getHeadCommitId());
             checkoutBranch(commit, args[0]);
         }
     }

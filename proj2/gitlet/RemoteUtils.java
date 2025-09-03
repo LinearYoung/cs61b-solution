@@ -2,8 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.util.*;
 
 import static gitlet.GitletConstants.*;
@@ -158,9 +157,14 @@ public class RemoteUtils {
             return;
         }
 
-        Path normalPath = Paths.get(remotePath).normalize();
-        remoteLocationMap.put(remoteName, normalPath.toString());
-
+        String[] split = remotePath.split("/");
+        StringBuilder convertedPath = new StringBuilder();
+        for (String elem : split) {
+            convertedPath.append(elem);
+            convertedPath.append(File.separator); // the correct separator, windows for \, linux for /
+        }
+        convertedPath.delete(convertedPath.length() - 1, convertedPath.length());
+        remoteLocationMap.put(remoteName, String.valueOf(convertedPath));
         saveRemoteLocationMap();
     }
 

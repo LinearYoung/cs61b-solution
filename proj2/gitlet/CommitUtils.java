@@ -2,7 +2,6 @@ package gitlet;
 
 import java.util.*;
 import java.io.File;
-import java.util.function.Predicate;
 
 import static gitlet.GitletConstants.*;
 import static gitlet.Utils.*;
@@ -51,7 +50,7 @@ public class CommitUtils {
      */
     public static String saveCommit(Commit commit) {
         String commmitId = getCommitId(commit);
-        File commmitFile = join(COMMITS_FILE, commmitId);
+        File commmitFile = join(COMMITS_DIR, commmitId);
         writeObject(commmitFile, commit);
         return commmitId;
     }
@@ -64,7 +63,7 @@ public class CommitUtils {
         if(commitId == null) {
             return null;
         }
-        return readObject(join(COMMITS_FILE, commitId), Commit.class);
+        return readObject(join(COMMITS_DIR, commitId), Commit.class);
     }
 
     /***
@@ -77,7 +76,7 @@ public class CommitUtils {
         if(prefix == null) {
             return null;
         }
-        List<String> commitList = plainFilenamesIn(COMMITS_FILE);
+        List<String> commitList = plainFilenamesIn(COMMITS_DIR);
         int queryCount = 0;
         String resultCommitId = null;
         for(String commit : commitList) {
