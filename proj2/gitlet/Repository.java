@@ -213,15 +213,14 @@ public class Repository {
                     System.out.println("Incorrect operands.");
                 }
                 fileName = args[2];
-                commit = CommitUtils.readCommitByPrefix(args[1]);
+                commit = CommitUtils.readCommitByPrefix(args[0]);
                 if (commit == null) {
                     System.out.println("No commit with that id exists.");
                     return;
                 }
             }
             checkoutFile(commit, fileName);
-        }
-        else {
+        } else {
             checkoutBranch(commit, args[0]);
         }
     }
