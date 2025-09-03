@@ -149,69 +149,33 @@ public class CommitUtils {
         return commitList;
     }
 
-    /**
-     * trace back to final commit with topo graph(dfs), return commit id list
-     */
-    public static List<String> collectCommitsTopoOrder(
-            String headId, String stop // 远端已有 或 到 final
-    ) {
-        Set<String> seen = new HashSet<>();
-        Set<String> need = new HashSet<>();
-        Deque<String> stack = new ArrayDeque<>();
-        stack.push(headId);
-
-        while (!stack.isEmpty()) {
-            String commitId = stack.pop();
-            if (commitId == null || !seen.add(commitId) || stop.equals(commitId)) {
-                continue;
-            }
-            need.add(commitId);
-            Commit c = CommitUtils.readCommit(commitId);
-            if (c.getParentId() != null) {
-                stack.push(c.getParentId());
-            }
-            if (c.getSecondParentId() != null) {
-                stack.push(c.getSecondParentId());
-            }
+    public static List<String> commitIdTraceBack(Commit currentCommit) {
+        List<String> commitList = new LinkedList<>();
+        Commit commitPtr = currentCommit;
+        while (commitPtr != null) {
+            commitList.add(getCommitId(commitPtr));
+            commitPtr = readCommit(commitPtr.getParentId());
         }
-
-        List<String> order = new ArrayList<>();
-        seen.clear();
-        for (String cid : need) {
-            dfsPost(cid, need, seen, order);
-        }
-        return order;
+        return commitList;
     }
 
-    private static void dfsPost(String commitId, Set<String> need, Set<String> seen, List<String> out) {
-        if (commitId == null || !need.contains(commitId) || !seen.add(commitId)) {
-            return;
+    public static List<String> commitAncestors(Commit commit, Set<String> visitedSet) {
+        String parentId = commit.getParentId();
+        String secondParentId = commit.getSecondParentId();
+        visitedSet.add(getCommitId(commit));
+        List<String> result = new LinkedList<>();
+        result.add(getCommitId(commit));
+        if (parentId != null && !visited(visitedSet, parentId)) {
+            result.addAll(commitAncestors(readCommit(parentId), visitedSet));
         }
-        Commit c = CommitUtils.readCommit(commitId);
-        dfsPost(c.getParentId(), need, seen, out);
-        dfsPost(c.getSecondParentId(), need, seen, out);
-        out.add(commitId); // while recursion, the parentCommit add to out before children commit
+        if (secondParentId != null && !visited(visitedSet, secondParentId)) {
+            result.addAll(commitAncestors(readCommit(secondParentId), visitedSet));
+        }
+        return result;
     }
 
-
-    /**
-     * get all ancestor include itself,by recursion
-     *
-     * @param currentCommit
-     * @param res
-     * @return list of ancestor id
-     */
-    public static List<String> commitAncestors(Commit currentCommit, List<String> res) {
-        String parentId = currentCommit.getParentId();
-        String secondParentId = currentCommit.getSecondParentId();
-        res.add(getCommitId(currentCommit));
-        if (parentId != null && !res.contains(parentId)) {
-            res.addAll(commitAncestors(readCommit(parentId), res));
-        }
-        if (secondParentId != null && !res.contains(secondParentId)) {
-            res.addAll(commitAncestors(readCommit(secondParentId), res));
-        }
-        return res;
+    private static boolean visited(Set<String> visitedSet, String commitId) {
+        return visitedSet.contains(commitId);
     }
 
     /**
@@ -252,25 +216,40 @@ public class CommitUtils {
         String branch2CommitId = BranchUtils.getCommitId(branchName2);
         Commit commit1 = readCommit(branch1CommitId);
         Commit commit2 = readCommit(branch2CommitId);
-        List<String> branch1AncestorsId = commitAncestors(commit1, new LinkedList<>());
-        List<String> branch2AncestorsId = commitAncestors(commit2, new LinkedList<>());
+        List<String> branch1AncestorsId = commitAncestors(commit1, new HashSet<>());
+        List<String> branch2AncestorsId = commitAncestors(commit2, new HashSet<>());
         List<String> commonAncestors = new LinkedList<>();
         for (String commitId : branch1AncestorsId) {
             if (branch2AncestorsId.contains(commitId)) {
                 commonAncestors.add(commitId);
             }
         }
-
-        Commit splitCommit = null;
-
-        for (String commitId : commonAncestors) {
-            Commit c = readCommit(commitId);
-            if (splitCommit == null || c.getCommitTime().after(splitCommit.getCommitTime())) {
-                splitCommit = c;
+        Map<String, Integer> inDegreeOfAncestors = inDegreeOfNodes(commonAncestors);
+        for (String commitId : inDegreeOfAncestors.keySet()) {
+            if (inDegreeOfAncestors.get(commitId) == 0) {
+                return CommitUtils.readCommit(commitId);
             }
         }
+        return null;
+    }
 
-        return splitCommit;
+    private static Map<String, Integer> inDegreeOfNodes(List<String> commitIds) {
+        Map<String, Integer> res = new HashMap<>();
+        for(String commitId : commitIds) {
+            res.put(commitId, 0);
+        }
+        for(String commitId : commitIds) {
+            Commit commit = CommitUtils.readCommit(commitId);
+            String parentId = commit.getParentId();
+            String secondParentId = commit.getSecondParentId();
+            if(parentId != null) {
+                res.put(parentId, res.get(parentId) + 1);
+            }
+            if(secondParentId != null) {
+                res.put(secondParentId, res.get(secondParentId) + 1);
+            }
+        }
+        return res;
     }
 
     /**

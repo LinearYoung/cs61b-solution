@@ -2,10 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TreeMap;
+import java.util.*;
 
 import static gitlet.GitletConstants.BRANCHES_DIR;
 import static gitlet.GitletConstants.REMOTE_FILE;
@@ -192,12 +189,16 @@ public class RemoteUtils {
         String remoteHead = readRemoteHead(remoteName);
         String remoteHeadCommitId = readRemoteBranch(remoteBranchName, remoteName);
         Commit currentCommit = CommitUtils.readCommit(Repository.getHeadCommitId());
+
+        List<String> historyCommitId = CommitUtils.commitIdTraceBack(currentCommit);
         if (Repository.getHeadCommitId().equals(remoteHeadCommitId)) {
             return;
         }
 
-        List<String> commitIdAppending = CommitUtils.collectCommitsTopoOrder(Repository.getHeadCommitId(), remoteHeadCommitId);
-        List<String> historyCommitId = CommitUtils.commitAncestors(currentCommit, new LinkedList<>());
+        int remoteIdx = historyCommitId.indexOf(remoteHeadCommitId);
+        List<String> commitIdAppending = historyCommitId.subList(0, remoteIdx);
+        Collections.reverse(commitIdAppending);
+
         if (!historyCommitId.contains(remoteHeadCommitId)) {
             System.out.println("Please pull down remote changes before pushing.");
             return;
