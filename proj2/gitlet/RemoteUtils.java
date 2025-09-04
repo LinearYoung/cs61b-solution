@@ -154,7 +154,7 @@ public class RemoteUtils {
             }
         }
         if (isRemoteAdded(remoteName)) {
-            System.out.println("A remote with name already exist.");
+            System.out.println("A remote with that name already exist.");
             return;
         }
 
