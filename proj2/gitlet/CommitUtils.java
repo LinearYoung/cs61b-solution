@@ -282,7 +282,8 @@ public class CommitUtils {
         if (!iscontain1 && !iscontain2) {
             return true;
         }
-        if (!iscontain1 || iscontain2) {
+        if (!iscontain1 || !iscontain2) {
+            //bug : iscontain2 but not !iscontain2
             return false;
         }
         Boolean sameContent = hasSameFileVersion(fileName, commit1, commit2);
