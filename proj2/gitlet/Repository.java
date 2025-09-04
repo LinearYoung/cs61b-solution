@@ -418,7 +418,7 @@ public class Repository {
         }
         //call the commit api to make a commit
         //set the secondparentId to it
-        commit("Merged " + branchName + "into " + HEAD + ".");
+        commit("Merged " + branchName + " into " + HEAD + ".");
         Commit mergeCommit = CommitUtils.readCommit(getHeadCommitId());
         mergeCommit.setSecondParentId(BranchUtils.getCommitId(branchName));
         //save the secondParentId
