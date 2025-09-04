@@ -19,7 +19,7 @@ public class RemoteUtils {
     }
 
     public static void saveRemoteLocationMap() {
-        writeObject(REMOTE_FILE, TreeMap.class);
+        writeObject(REMOTE_FILE, remoteLocationMap);
     }
 
     public static boolean remoteRefsInitialized() {
@@ -190,15 +190,12 @@ public class RemoteUtils {
         String remoteHeadCommitId = readRemoteBranch(remoteBranchName, remoteName);
         Commit currentCommit = CommitUtils.readCommit(Repository.getHeadCommitId());
 
-        List<String> historyCommitId = CommitUtils.commitIdTraceBack(currentCommit);
         if (Repository.getHeadCommitId().equals(remoteHeadCommitId)) {
             return;
         }
 
-        int remoteIdx = historyCommitId.indexOf(remoteHeadCommitId);
-        List<String> commitIdAppending = historyCommitId.subList(0, remoteIdx);
-        Collections.reverse(commitIdAppending);
-
+        List<String> commitIdAppending = CommitUtils.collectCommitsTopoOrder(Repository.getHeadCommitId(), remoteHeadCommitId);
+        List<String> historyCommitId = CommitUtils.commitAncestors(currentCommit, new HashSet<>());
         if (!historyCommitId.contains(remoteHeadCommitId)) {
             System.out.println("Please pull down remote changes before pushing.");
             return;
